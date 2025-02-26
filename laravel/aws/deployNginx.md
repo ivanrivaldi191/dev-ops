@@ -199,18 +199,47 @@
 
 		0 0 * * * certbot renew --nginx --quiet
 		```
+Extra Notes:
+- For the documentation purpose, all the sources and targets will mostly be set as anywhere. If you want to have some restrictions on the server, update it for your convenience
+- If you encountered file limit size error, you can fix it like this:
+```
+sudo nano /etc/nginx/nginx.conf
+
+[add this on the server or http]
+client_max_body_size 10M; # This indicates the maximum body size is 10 MB, php by default only allowed 8MB on post
+```
+
+For the php part
+```
+sudo nano /etc/php/8.3/cli/php.ini
+
+[you can modify it like this]
+upload_max_filesize = 10M
+```
+
+After that restart your nginx
+```
+sudo systemctl restart nginx
+```
+
 <br>
 Study References:
 <br>
-[Procedural Steps](https://dev.to/mdarifulhaque/step-by-step-deploy-laravel-app-to-cloud-aws-google-azure-digitalocean-with-cicd-using-github-actionsgitlab-ci-2hb9)
+
+- [Procedural Steps Dev.to](https://dev.to/mdarifulhaque/step-by-step-deploy-laravel-app-to-cloud-aws-google-azure-digitalocean-with-cicd-using-github-actionsgitlab-ci-2hb9)
 <br>
-[Procedural Steps](https://medium.com/@bjnandi/how-to-deploy-laravel-application-to-ec2-instance-using-github-action-automatically-ssh-deploy-e198b0a3136d)
+
+- [Procedural Steps Medium](https://medium.com/@bjnandi/how-to-deploy-laravel-application-to-ec2-instance-using-github-action-automatically-ssh-deploy-e198b0a3136d)
 <br>
-[Snippet Commands](https://medium.com/@vinoji2005/guide-to-setup-lets-encrypt-ssl-in-nginx-be3d641bb58a)
+
+- [Snippet Commands SSL Certificate](https://medium.com/@vinoji2005/guide-to-setup-lets-encrypt-ssl-in-nginx-be3d641bb58a)
 <br>
-[Snippet Config](https://gist.github.com/dorelljames/9da3063878b9c3030d6538b6724122ac)
+
+- [Snippet Config](https://gist.github.com/dorelljames/9da3063878b9c3030d6538b6724122ac)
 <br>
-[Snippet Commands](https://github.com/hardcoreprogrammingwarrior/deploy-laravel-8-with-ec2-linux-2-and-rds)
+
+- [Snippet Commands Steps](https://github.com/hardcoreprogrammingwarrior/deploy-laravel-8-with-ec2-linux-2-and-rds)
 <br>
-[Youtube to Visualize](https://youtu.be/mBEdFlw4ybc?si=_q0iN_7ANfnfCClW)
+
+- [Youtube to Visualize](https://youtu.be/mBEdFlw4ybc?si=_q0iN_7ANfnfCClW)
 <br>
