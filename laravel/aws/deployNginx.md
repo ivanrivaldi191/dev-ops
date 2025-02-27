@@ -14,23 +14,24 @@
 	Note: If you set it publicly, you have an issue regarding safety and of course, you can still use it to connect to the EC2 instance manually.
 
 ## Setup EC2 Instance
-- Connect to the EC2 instance.
-	- ssh -i "your_file.pem" [username]@[endpoint]
-		example:
-		<br>
-		```
-		ssh -i path/to/secret.pem ubuntu@ec2-instance.amazon.com
-		```
-	- Now you have multiple options here; either you want to use Nginx or Apache Web Server. As for now, we will use Nginx.
-		<br>
-		The part on ppa:ondrej/php is necessary since the base Linux will have a hard time fetching the package from PHP. If you use Debian, you might want to check if it's still ppa:ondrej or the other. The main search keyword is "Ondrej Sury PHP package linux distro."
-		```
-		sudo add-apt-repository ppa:ondrej/php
-		sudo apt update
-		sudo apt install nginx
-		sudo apt install php php-fpm php-mysql php-mbstring php-xml php-curl php-zip php-pgsql
-		sudo apt install composer
-		```
+Connect to the EC2 instance.
+- ssh -i "your_file.pem" [username]@[endpoint]
+	example:
+	<br>
+	```
+	ssh -i path/to/secret.pem ubuntu@ec2-instance.amazon.com
+	```
+
+- Now you have multiple options here; either you want to use Nginx or Apache Web Server. As for now, we will use Nginx.
+	<br>
+	The part on ppa:ondrej/php is necessary since the base Linux will have a hard time fetching the package from PHP. If you use Debian, you might want to check if it's still ppa:ondrej or the other. The main search keyword is "Ondrej Sury PHP package linux distro."
+	```
+	sudo add-apt-repository ppa:ondrej/php
+	sudo apt update
+	sudo apt install nginx
+	sudo apt install php php-fpm php-mysql php-mbstring php-xml php-curl php-zip php-pgsql
+	sudo apt install composer
+	```
 
 ## Setup NGINX
 ```
