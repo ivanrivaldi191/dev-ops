@@ -71,6 +71,10 @@ sudo ln -s /etc/nginx/sites-available/laravel /etc/nginx/sites-enabled/
 sudo systemctl restart nginx
 ```
 
+Don't forget to register you domain to your elastic IP address!
+<br>
+Right now it should be able to accessed but it's still on http
+
 ## Setup chown (Optional | Mandatory if you wanted to prevent sudo)
 Optional/Mandatory Part
 If you wanted to easily access /var/www, then you might want to change your access using chown and chmod.
@@ -148,9 +152,6 @@ php artisan db:seed
 ```
 
 ## Setup SSL
-Don't forget to register you domain to your elastic IP address!
-Right now it should be able to accessed but it's still on http
-
 For the https part, you also have so many ways, for now I will demonstrate the nginx + certbot
 ```
 sudo apt install certbot
