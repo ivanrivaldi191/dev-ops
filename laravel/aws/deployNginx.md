@@ -204,7 +204,7 @@ server {
 
 	# Redirect https request of this exception URL to http
 	# location /except {
-	#     return 301 http://example.com$request_uri;
+	#     return 301 http://$host$request_uri;
 	# }
 
 	location ~ \.php$ {
