@@ -172,6 +172,17 @@ Certbot has set up a scheduled task to automatically renew this certificate in t
 
 ## Setup SSL NGINX Config
 
+For port 80 you can forced it into redirect to https like this
+```
+location / {
+	return 301 http://$host$request_uri;
+	# return 301 https://$host$request_uri;
+}
+
+[or]
+return 301 http://$host$request_uri;
+# return 301 https://$host$request_uri;
+```
 Now after the certificate has been created update you nginx config into something like this
 ```
 server {
@@ -204,7 +215,7 @@ server {
 
 	# Redirect https request of this exception URL to http
 	# location /except {
-	#     return 301 http://example.com$request_uri;
+	#     return 301 http://$host$request_uri;
 	# }
 
 	location ~ \.php$ {
