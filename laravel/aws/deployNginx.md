@@ -278,6 +278,31 @@ sudo systemctl restart nginx
 Extra Notes:
 - For the documentation purpose, all the sources and targets will mostly be set as anywhere. If you want to have some restrictions on the server, update it for your convenience
 
+### NGINX randomly can't be activated
+There are 3 common causes:
+- The port is already used by other service, to check it you can use
+```
+lsof -i :80
+
+sudo netstat -plant | grep 80
+```
+- The port is reserved by default service (which in the case is the same as point 1) usually it's apache, simply run
+```
+sudo apachectl stop
+sudo systemctl stop apache2
+sudo /etc/init.d/apache2 stop
+
+sudo systemctl status apache2
+```
+- The port is used by nginx itself, usually this case happens because either of replicated instance or default nginx is alive
+```
+sudo netstat -plant | grep 80
+
+sudo pkill -f nginx & wait $!
+sudo systemctl restart nginx
+sudo systemctl status nginx
+```
+
 <br>
 Study References:
 <br>
