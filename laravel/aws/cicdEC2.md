@@ -178,3 +178,6 @@ Study References:
 
 - [Youtube to Visualize](https://youtu.be/531i-n5FMRY?si=yxFXzHmw4LBdO_hr)
 <br>
+
+- [Issue Regarding NGINX](https://stackoverflow.com/questions/14972792/nginx-nginx-emerg-bind-to-80-failed-98-address-already-in-use)
+<br>
