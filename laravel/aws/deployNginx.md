@@ -33,6 +33,46 @@ Connect to the EC2 instance.
 	sudo apt install composer
 	```
 
+## (Optional) Setting Up ELB instead of Elastic IP
+- Create Target Group
+	- Instance
+	- Named it example "BE Dev Target Group"
+	- HTTP Port 80, IPv4, own VPC and HTTP protocol (usually it's HTTP1)
+	- Create and Save for BE and/or FE
+- Create Load Balancer(LB)
+	- Choose your desired LB for this subject I will used App LB
+		- Insert name, example "MyApp Load Balancer"
+		- Internet Facing (I will use my own domain)
+		- IPv4
+	- Choose the EC2 Instance VPC
+	- Choose all available zones
+	- Create or Choose the security group for the ELB, example:
+		- Create Security Group named "ELB Sec Group"
+		- Inbound HTTP and HTTPS
+		- Outbound All Traffic
+	- Listen to Port 80
+		- On default Port 80, Listen to BE Target Group
+		- Add new Rule for FE
+			- Add Rule and named it, example "FE LB"
+			- Add Condition "Host Header" if you have already own a domain, example "sub1.domain.com"
+			- Forward it to FE Target Group
+		- IF you have already own a domain and wanted to redirect to HTTPS then:
+			- Redirect to URL
+			- HTTPS port 443
+			- Status Code 301
+	- Add tags if needed
+- Before you register your subdomain/domain to the ELB IP it's recommended that you create a SSL Certificate for the LB first, for this time I will use ACM(AWS Certificate Manager)
+	- Create/Request Public Certificate
+	- Input your domain
+	- DNS validation
+	- Choose your key algorithm
+	- Save it and wait for around 5 to 10 minutes until it's accepted
+	- Copy the CNAME name and CNAME value
+- Go to your domain management
+	- Add CNAME Record; with HOST is the CNAME name and VALUE is the CNAME value [This is for the certificate]
+	- Add CNAME Record; with HOST is the subdomain/domain name and VALUE is the ELB DNS value [This is for the BE and FE]
+	- NOTE: You won't have to set nginx config for 443 just port 80 since the 443 will be handled by the ELB
+
 ## Setup NGINX
 ```
 sudo nano /etc/nginx/sites-available/laravel
@@ -235,6 +275,43 @@ sudo crontab -e
 0 0 * * * certbot renew --nginx --quiet
 ```
 
+## Queue and Scheduler
+```
+sudo apt update && sudo apt install supervisor
+sudo supervisorctl status
+sudo nano /etc/supervisor/conf.d/laravel-worker.conf
+```
+
+in the `laravel-worker.conf`
+```
+[program:laravel-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /path-to-your-project/artisan queue:work --sleep=3 --tries=3
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+user=root
+numprocs=8
+redirect_stderr=true
+stdout_logfile=/path-to-your-project/storage/logs/worker.log
+stopwaitsecs=3600
+```
+
+```
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start laravel-worker:*
+sudo crontab -e
+```
+
+```
+* * * * * php /path-to-your-project/artisan schedule:run >> /dev/null 2>&1
+```
+```
+sudo service cron reload
+```
+
 ## Common Issues
 ### Composer version does not matched with the php version
 ```
@@ -265,7 +342,7 @@ client_max_body_size 10M; # This indicates the maximum body size is 10 MB, php b
 
 php.ini config
 ```
-sudo nano /etc/php/8.3/cli/php.ini
+sudo nano /etc/php/8.3/fpm/php.ini
 
 [you can modify it like this]
 upload_max_filesize = 10M
@@ -301,6 +378,12 @@ sudo netstat -plant | grep 80
 sudo pkill -f nginx & wait $!
 sudo systemctl restart nginx
 sudo systemctl status nginx
+```
+
+### Removing Certificates
+```
+sudo certbot certificates
+sudo certbot delete
 ```
 
 <br>

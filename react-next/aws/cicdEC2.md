@@ -32,7 +32,7 @@ Code Deployment Role
 5. Create the Role.
 
 ## Setup Role to EC2
-I assume you have already created an EC2 instance, if you haven't you migh wanted to check <a href="deployNginx.md">How to deploy Laravel to AWS EC2 using NGINX.</a>
+I assume you have already created an EC2 instance, if you haven't you migh wanted to check <a href="deployNginx.md">How to deploy next to AWS EC2 using NGINX.</a>
 <br>
 If you have created an instance or in process on creating you can assign IAM instance profile / IAM Role and choose your created EC2 Code Deploy Role.
 
@@ -85,14 +85,14 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /var/www/path/to/your/laravel
+    destination: /var/www/path/to/your/next
 hooks:
   BeforeInstall:
     - location: scripts/install_dependencies.sh
       timeout: 300
       runas: root
   AfterInstall:
-    - location: scripts/deploy_laravel.sh
+    - location: scripts/deploy_next.sh
       timeout: 300
       runas: root
   ApplicationStart:
@@ -112,22 +112,19 @@ After that create a directory named `scripts`, in this directory will consists t
 sudo apt install nginx
 ```
 
-- deploy_laravel.sh
+- deploy_next.sh
 ```
 #!/bin/bash
 
-export COMPOSER_ALLOW_SUPERUSER=1 # This is required if you used root/superuser
-composer install -d /var/www/laravel/app-backend
-php /var/www/laravel/app-backend/artisan migrate
+cd /home/ubuntu/code/paketur-frontend
+pnpm install
 
-# Clear Previous Caches
-php /var/www/laravel/app-backend/artisan config:clear
-php /var/www/laravel/app-backend/artisan cache:clear
-php /var/www/laravel/app-backend/artisan route:clear
+[in case you are running monorepo]
+pnpm run app1:build
+pnpm run app2:build
 
-
-# Optimize Laravel
-php /var/www/laravel/app-backend/artisan optimize
+export HOME=/root
+/root/.local/share/pnpm/pm2 restart all
 ```
 
 - start_server.sh
@@ -164,13 +161,41 @@ CodePipeline > AWS CodeDeploy > View Events > [Usually there will be a log/file 
 ### Yum does not exists
 This one should be easy, check for your OS if it's the basic Ubuntu, usually they don't have that so the option is to use sudo apt
 
+### Cannot run as ubuntu, alt using root
+```
+which pnpm
+which pm2
+sudo ln -s /home/ubuntu/.local/share/pnpm/pnpm /usr/bin/pnpm
+sudo ln -s /home/ubuntu/.nvm/versions/node/v22.14.0/bin/node /usr/bin/node
+
+sudo su
+pnpm setup
+pnpm install pm2 -g
+
+pm2 start pnpm --name "App1" --cwd ./apps/app1/ -- start
+pm2 start pnpm --name "App2" --cwd ./apps/app2/ -- start -p 3001
+```
+
+### Running out of memory when building
+You can use swap technique or just build it locally then upload it to the server.
+<br>
+
+For swap technique please read these articles:
+<br>
+
+- [How to swap space](https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu-20-04)
+<br>
+
+- [AWS monitoring](https://aws.amazon.com/blogs/mt/setup-memory-metrics-for-amazon-ec2-instances-using-aws-systems-manager/)
+<br>
+
 Study References:
 <br>
 
 - [AWS Documentation](https://docs.aws.amazon.com/codedeploy/latest/userguide/codedeploy-agent-operations.html)
 <br>
 
-- [Snippet Command Steps](https://github.com/pietheinstrengholt/aws-codepipeline-laravel/blob/master/README.md)
+- [Snippet Command Steps](https://github.com/pietheinstrengholt/aws-codepipeline-next/blob/master/README.md)
 <br>
 
 - [Snippet Command Steps](https://github.com/aarhemareddy/aws_cicd_pipline_codedeploy/blob/main/README.md)
